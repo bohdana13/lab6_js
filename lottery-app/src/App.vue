@@ -25,7 +25,6 @@
       </button>
     </div>
 
-    <!-- Registration Form -->
     <div class="card">
       <h3>REGISTER FORM</h3>
       <p>Please fill in all the fields.</p>
@@ -82,7 +81,6 @@
       </form>
     </div>
 
-    <!-- Participants Table -->
     <div class="card">
       <table class="table table-striped">
         <thead>
@@ -92,6 +90,7 @@
             <th>Date of Birth</th>
             <th>Email</th>
             <th>Phone number</th>
+            <th>Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -101,6 +100,14 @@
             <td>{{ participant.dateOfBirth }}</td>
             <td>{{ participant.email }}</td>
             <td>{{ participant.phoneNumber }}</td>
+            <td>
+              <button
+                @click="removeParticipant(index)"
+                class="btn btn-sm btn-danger delete-btn"
+              >
+                Delete
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -124,42 +131,40 @@ export default defineComponent({
       phoneNumber: "",
     });
 
-    // Participants
     const participants = ref<Participant[]>([
       {
-        name: "John Doe",
-        dateOfBirth: "1990-01-01",
-        email: "john@example.com",
-        phoneNumber: "+1234567890",
+        name: "Tetiana Mamontova ",
+        dateOfBirth: "29-01-2005",
+        email: "tetiana@example.com",
+        phoneNumber: "+380978040547",
       },
       {
-        name: "Jane Smith",
-        dateOfBirth: "1985-05-15",
-        email: "jane@example.com",
-        phoneNumber: "+1987654321",
+        name: "Katherine Petrovna",
+        dateOfBirth: "23-05-1985",
+        email: "k.petryvna@example.com",
+        phoneNumber: "+380669876543",
       },
       {
-        name: "Alice Johnson",
-        dateOfBirth: "1992-03-10",
-        email: "alice@example.com",
-        phoneNumber: "+11234567890",
+        name: "Andriy Mykolay",
+        dateOfBirth: "10-03-2022",
+        email: "a.mykolayenko@example.com",
+        phoneNumber: "+380685432109",
       },
       {
-        name: "Bob Brown",
-        dateOfBirth: "1988-07-22",
-        email: "bob@example.com",
-        phoneNumber: "+19987654321",
+        name: "Natalia Sydorenko",
+        dateOfBirth: "10-07-2021",
+        email: "n.sydorenko@example.com",
+        phoneNumber: "+380503214567",
       },
       {
-        name: "Charlie Green",
-        dateOfBirth: "1995-10-05",
-        email: "charlie@example.com",
-        phoneNumber: "+17654321098",
+        name: "Sergey Kovalenko",
+        dateOfBirth: "05-10-2019",
+        email: "s.kovalenko@example.com",
+        phoneNumber: "+380637654321",
       },
     ]);
     const winners = ref<Participant[]>([]);
 
-    // Error messages
     const nameError = ref("");
     const dateError = ref("");
     const emailError = ref("");
@@ -208,6 +213,10 @@ export default defineComponent({
       winners.value.splice(index, 1);
     };
 
+    const removeParticipant = (index: number) => {
+      participants.value.splice(index, 1);
+    };
+
     return {
       newParticipant,
       participants,
@@ -220,16 +229,13 @@ export default defineComponent({
       registerParticipant,
       selectWinner,
       removeWinner,
+      removeParticipant,
     };
   },
 });
 </script>
 
 <style scoped>
-/** {
-  border: solid green 1px;
-}*/
-
 .lottery-app {
   display: grid;
   grid-template-columns: 1fr;
@@ -307,5 +313,11 @@ td {
 
 button {
   margin-top: 10px;
+}
+.delete-btn {
+  width: 80px;
+  height: 30px;
+  margin: 0 auto;
+  display: block;
 }
 </style>
