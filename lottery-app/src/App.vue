@@ -1,129 +1,50 @@
 <template>
   <div class="lottery-app">
-    <div class="card">
-      <div class="d-flex">
-        <div class="winner-tags gray-border">
-          <span
-            v-for="(winner, index) in winners"
-            :key="index"
-            class="badge blue"
-          >
-            {{ winner.name }}
-            <button @click="removeWinner(index)" class="btn btn-sm btn-danger">
-              &times;
-            </button>
-          </span>
-          <span class="badge">Winners</span>
-        </div>
-      </div>
-      <button
-        class="btn btn-primary mt-2"
-        :disabled="winners.length >= 3 || participants.length === 0"
-        @click="selectWinner"
-      >
-        New winner
-      </button>
-    </div>
+    <!-- Winners Block -->
+    <WinnerListBlock
+      :winners="winners"
+      :selectWinner="selectWinner"
+      :removeWinner="removeWinner"
+    />
 
+    <!-- Registration Form -->
     <div class="card">
       <h3>REGISTER FORM</h3>
       <p>Please fill in all the fields.</p>
-      <form @submit.prevent="registerParticipant" novalidate>
-        <div class="form-group">
-          <label>Name</label>
-          <input
-            v-model="newParticipant.name"
-            type="text"
-            class="form-control"
-            placeholder="Enter user name"
-            :class="{ 'is-invalid': nameError }"
-            required
-          />
-          <div class="text-danger" v-if="nameError">{{ nameError }}</div>
-        </div>
-        <div class="form-group">
-          <label>Date of Birth</label>
-          <input
-            v-model="newParticipant.dateOfBirth"
-            type="date"
-            class="form-control"
-            :max="today"
-            :class="{ 'is-invalid': dateError }"
-            required
-          />
-          <div class="text-danger" v-if="dateError">{{ dateError }}</div>
-        </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input
-            v-model="newParticipant.email"
-            type="email"
-            class="form-control"
-            placeholder="Enter email"
-            :class="{ 'is-invalid': emailError }"
-            required
-          />
-          <div class="text-danger" v-if="emailError">{{ emailError }}</div>
-        </div>
-        <div class="form-group">
-          <label>Phone number</label>
-          <input
-            v-model="newParticipant.phoneNumber"
-            type="tel"
-            class="form-control"
-            placeholder="Enter phone number"
-            :class="{ 'is-invalid': phoneError }"
-            required
-          />
-          <div class="text-danger" v-if="phoneError">{{ phoneError }}</div>
-        </div>
-        <button type="submit" class="btn btn-primary">Save</button>
-      </form>
+      <RegistrationForm
+        :newParticipant="newParticipant"
+        :nameError="nameError"
+        :dateError="dateError"
+        :emailError="emailError"
+        :phoneError="phoneError"
+        :today="today"
+        @update:newParticipant="updateNewParticipant"
+        @submit="registerParticipant"
+      />
     </div>
 
-    <div class="card">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Date of Birth</th>
-            <th>Email</th>
-            <th>Phone number</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(participant, index) in participants" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ participant.name }}</td>
-            <td>{{ participant.dateOfBirth }}</td>
-            <td>{{ participant.email }}</td>
-            <td>{{ participant.phoneNumber }}</td>
-            <td>
-              <button
-                @click="removeParticipant(index)"
-                class="btn btn-sm btn-danger delete-btn"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Participants Table -->
+    <ParticipantsTable :participants="participants" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { Validator } from "@/validation/Validator";
-import { Participant } from "@/models/Participant";
+import { Validator } from "./validation/Validator";
+import { Participant } from "./models/Participant";
+import WinnerListBlock from "./components/WinnerList.vue";
+import RegistrationForm from "./components/RegistrationForm.vue";
+import ParticipantsTable from "./components/ParticipantsTable.vue";
 
 export default defineComponent({
-  name: "LotteryApp",
+  name: "App",
+  components: {
+    WinnerListBlock,
+    RegistrationForm,
+    ParticipantsTable,
+  },
   setup() {
-    const today = new Date().toISOString().split("T")[0]; // Current date
+    const today = new Date().toISOString().split("T")[0];
     const newParticipant = ref<Participant>({
       name: "",
       dateOfBirth: "",
@@ -133,34 +54,16 @@ export default defineComponent({
 
     const participants = ref<Participant[]>([
       {
-        name: "Tetiana Mamontova ",
-        dateOfBirth: "29-01-2005",
-        email: "tetiana@example.com",
-        phoneNumber: "+380978040547",
+        name: "John Doe",
+        dateOfBirth: "1990-01-01",
+        email: "john@example.com",
+        phoneNumber: "+1234567890",
       },
       {
-        name: "Katherine Petrovna",
-        dateOfBirth: "23-05-1985",
-        email: "k.petryvna@example.com",
-        phoneNumber: "+380669876543",
-      },
-      {
-        name: "Andriy Mykolay",
-        dateOfBirth: "10-03-2022",
-        email: "a.mykolayenko@example.com",
-        phoneNumber: "+380685432109",
-      },
-      {
-        name: "Natalia Sydorenko",
-        dateOfBirth: "10-07-2021",
-        email: "n.sydorenko@example.com",
-        phoneNumber: "+380503214567",
-      },
-      {
-        name: "Sergey Kovalenko",
-        dateOfBirth: "05-10-2019",
-        email: "s.kovalenko@example.com",
-        phoneNumber: "+380637654321",
+        name: "Jane Smith",
+        dateOfBirth: "1985-05-15",
+        email: "jane@example.com",
+        phoneNumber: "+1987654321",
       },
     ]);
     const winners = ref<Participant[]>([]);
@@ -191,10 +94,12 @@ export default defineComponent({
       }
 
       participants.value.push({ ...newParticipant.value });
-      newParticipant.value.name = "";
-      newParticipant.value.dateOfBirth = "";
-      newParticipant.value.email = "";
-      newParticipant.value.phoneNumber = "";
+      newParticipant.value = {
+        name: "",
+        dateOfBirth: "",
+        email: "",
+        phoneNumber: "",
+      };
     };
 
     const selectWinner = () => {
@@ -213,8 +118,8 @@ export default defineComponent({
       winners.value.splice(index, 1);
     };
 
-    const removeParticipant = (index: number) => {
-      participants.value.splice(index, 1);
+    const updateNewParticipant = (updatedParticipant: Participant) => {
+      newParticipant.value = updatedParticipant;
     };
 
     return {
@@ -229,13 +134,17 @@ export default defineComponent({
       registerParticipant,
       selectWinner,
       removeWinner,
-      removeParticipant,
+      updateNewParticipant,
     };
   },
 });
 </script>
 
 <style scoped>
+/** {
+  border: solid green 1px;
+}*/
+
 .lottery-app {
   display: grid;
   grid-template-columns: 1fr;
@@ -313,11 +222,5 @@ td {
 
 button {
   margin-top: 10px;
-}
-.delete-btn {
-  width: 80px;
-  height: 30px;
-  margin: 0 auto;
-  display: block;
 }
 </style>
