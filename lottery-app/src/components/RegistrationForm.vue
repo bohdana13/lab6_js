@@ -55,7 +55,6 @@ export default defineComponent({
   setup(props, { emit }) {
     const localParticipant = ref({ ...props.newParticipant });
 
-    // Watch for changes in newParticipant prop and update local copy
     watch(
       () => props.newParticipant,
       (newVal) => {

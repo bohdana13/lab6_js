@@ -1,13 +1,12 @@
 <template>
   <div class="lottery-app">
-    <!-- Winners Block -->
-    <WinnerListBlock
+    <WinnerList
       :winners="winners"
       :selectWinner="selectWinner"
       :removeWinner="removeWinner"
+      :participants="participants"
     />
 
-    <!-- Registration Form -->
     <div class="card">
       <h3>REGISTER FORM</h3>
       <p>Please fill in all the fields.</p>
@@ -23,7 +22,6 @@
       />
     </div>
 
-    <!-- Participants Table -->
     <ParticipantsTable :participants="participants" />
   </div>
 </template>
@@ -32,14 +30,14 @@
 import { defineComponent, ref } from "vue";
 import { Validator } from "./validation/Validator";
 import { Participant } from "./models/Participant";
-import WinnerListBlock from "./components/WinnerList.vue";
+import WinnerList from "./components/WinnerList.vue";
 import RegistrationForm from "./components/RegistrationForm.vue";
 import ParticipantsTable from "./components/ParticipantsTable.vue";
 
 export default defineComponent({
   name: "App",
   components: {
-    WinnerListBlock,
+    WinnerList,
     RegistrationForm,
     ParticipantsTable,
   },
@@ -66,6 +64,7 @@ export default defineComponent({
         phoneNumber: "+1987654321",
       },
     ]);
+
     const winners = ref<Participant[]>([]);
 
     const nameError = ref("");
@@ -141,10 +140,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/** {
-  border: solid green 1px;
-}*/
-
 .lottery-app {
   display: grid;
   grid-template-columns: 1fr;

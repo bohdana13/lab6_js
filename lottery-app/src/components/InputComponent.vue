@@ -31,7 +31,7 @@ export default defineComponent({
   emits: ["update:modelValue"],
   methods: {
     updateValue(event: Event) {
-      const target = event.target as HTMLInputElement; // Safely cast the target
+      const target = event.target as HTMLInputElement;
       if (target) {
         this.$emit("update:modelValue", target.value);
       }
