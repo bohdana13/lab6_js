@@ -1,7 +1,7 @@
 <template>
   <span class="badge blue" v-if="winner">
     {{ winner.name }}
-    <button @click="removeWinner" class="btn btn-sm btn-danger">&times;</button>
+    <button @click="removeWinner" class="btn btn-sm">&times;</button>
   </span>
 </template>
 
