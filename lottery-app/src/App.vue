@@ -49,24 +49,8 @@ export default defineComponent({
       email: "",
       phoneNumber: "",
     });
-
-    const defaultParticipants = ref<Participant[]>([
-      {
-        name: "John Doe",
-        dateOfBirth: "1990-01-01",
-        email: "john@example.com",
-        phoneNumber: "+1234567890",
-      },
-      {
-        name: "Jane Smith",
-        dateOfBirth: "1985-05-15",
-        email: "jane@example.com",
-        phoneNumber: "+1987654321",
-      },
-    ]);
     const participants = ref<Participant[]>(
-      JSON.parse(localStorage.getItem("participants") || "null") ||
-        defaultParticipants
+      JSON.parse(localStorage.getItem("participants") || "null")
     );
     watch(
       participants,
