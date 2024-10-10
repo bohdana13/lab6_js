@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import { Validator } from "./validation/Validator";
 import { Participant } from "./models/Participant";
 import WinnerList from "./components/WinnerList.vue";
@@ -50,7 +50,7 @@ export default defineComponent({
       phoneNumber: "",
     });
 
-    const participants = ref<Participant[]>([
+    const defaultParticipants = ref<Participant[]>([
       {
         name: "John Doe",
         dateOfBirth: "1990-01-01",
@@ -64,7 +64,17 @@ export default defineComponent({
         phoneNumber: "+1987654321",
       },
     ]);
-
+    const participants = ref<Participant[]>(
+      JSON.parse(localStorage.getItem("participants") || "null") ||
+        defaultParticipants
+    );
+    watch(
+      participants,
+      (newParticipants) => {
+        localStorage.setItem("participants", JSON.stringify(newParticipants));
+      },
+      { deep: true }
+    );
     const winners = ref<Participant[]>([]);
 
     const nameError = ref("");
