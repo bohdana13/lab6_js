@@ -101,7 +101,7 @@ export default defineComponent({
       );
 
       if (existingParticipant) {
-        emailError.value = "Учасник з такою електронною поштою вже існує.";
+        emailError.value = "A participant with such e-mail already exists";
         return;
       }
       participants.value.push({ ...newParticipant.value });

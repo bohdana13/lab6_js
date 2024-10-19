@@ -35,22 +35,30 @@
           <td>{{ participant.email }}</td>
           <td>{{ participant.phoneNumber }}</td>
           <td>
-            <ButtonComponent @click="remove(index)" class="delete-btn">Delete</ButtonComponent>
+            <ButtonComponent @click="confirmRemove(participant)" class="delete-btn">Delete</ButtonComponent>
           </td>
         </tr>
       </tbody>
     </table>
+    <ConfirmDeleteModal
+      v-if="selectedParticipant"
+      :isVisible="isModalVisible"
+      :participant="selectedParticipant"
+      @confirm="removeParticipant"
+      @cancel="isModalVisible = false"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from "vue";
+import { defineComponent, PropType, computed, ref } from "vue";
 import { Participant } from '../models/Participant';
 import ButtonComponent from './ButtonComponent.vue';
+import ConfirmDeleteModal from './ModalComponent.vue';
 
 export default defineComponent({
   name: "ParticipantsTable",
-  components: { ButtonComponent },
+  components: { ButtonComponent, ConfirmDeleteModal },
   props: {
     participants: {
       type: Array as PropType<Participant[]>,
@@ -100,5 +108,31 @@ export default defineComponent({
       this.$emit("remove", index);
     },
   },
+  setup(props, { emit }) { 
+    const isModalVisible = ref(false);
+    const selectedParticipant = ref<Participant | null>(null);
+
+    const confirmRemove = (participant: Participant) => {
+      selectedParticipant.value = participant;
+      isModalVisible.value = true;
+    };
+
+    const removeParticipant = () => {
+      if (selectedParticipant.value !== null) {
+        const participantIndex = props.participants.findIndex(p => p.email === selectedParticipant.value!.email);
+        if (participantIndex !== -1) {
+          emit("remove", participantIndex);
+        }
+        isModalVisible.value = false;
+        selectedParticipant.value = null;
+      }
+    };
+    return {
+      isModalVisible,
+      selectedParticipant,
+      confirmRemove,
+      removeParticipant
+    };
+  }
 });
 </script>
