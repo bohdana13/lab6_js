@@ -1,11 +1,9 @@
 <template>
   <div class="lottery-app">
-    <!-- Список переможців -->
     <WinnerList 
     :winners="winners" 
     @remove-winner="removeWinner" />
 
-    <!-- Кнопка для вибору нового переможця -->
     <ButtonComponent class="btn btn-primary mt-2"
       :disabled="winners.length >= 3 || participants.length === 0"
       @click="selectWinner"
@@ -13,7 +11,6 @@
       New winner
     </ButtonComponent>
 
-    <!-- Форма реєстрації -->
     <RegistrationForm
       :newParticipant="newParticipant"
       :today="today"
@@ -21,7 +18,6 @@
       @register="registerParticipant"
     />
 
-    <!-- Таблиця з учасниками -->
     <ParticipantsTable
       :participants="participants"
       @remove="removeParticipant"
@@ -30,13 +26,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref, watch } from "vue";
 import WinnerList from "./components/WinnerList.vue";
 import RegistrationForm from "./components/RegistrationForm.vue";
 import ParticipantsTable from "./components/ParticipantsTable.vue";
 import ButtonComponent from "./components/ButtonComponent.vue";
-import { Participant } from './models/Participant'; // Імпорт типу Participant
-import { Validator } from './validation/Validator'; // Імпорт валідатора
+import { Participant } from './models/Participant'; 
+import { Validator } from './validation/Validator'; 
 
 export default defineComponent({
   name: "LotteryApp",
@@ -47,7 +43,7 @@ export default defineComponent({
     ButtonComponent,
   },
   setup() {
-    const today = new Date().toISOString().split("T")[0]; // Поточна дата
+    const today = new Date().toISOString().split("T")[0]; 
     const newParticipant = ref<Participant>({
       name: "",
       dateOfBirth: "",
@@ -55,20 +51,7 @@ export default defineComponent({
       phoneNumber: "",
     });
 
-    const participants = ref<Participant[]>([
-      {
-        name: "Tetiana Mamontova",
-        dateOfBirth: "2005-01-29",
-        email: "tetiana@example.com",
-        phoneNumber: "+380978040547",
-      },
-      {
-        name: "Katherine Petrovna",
-        dateOfBirth: "1985-05-23",
-        email: "k.petryvna@example.com",
-        phoneNumber: "+380669876543",
-      },
-    ]);
+    const participants = ref<Participant[]>([]);
 
     const winners = ref<Participant[]>([]);
 
@@ -76,7 +59,20 @@ export default defineComponent({
     const dateError = ref("");
     const emailError = ref("");
     const phoneError = ref("");
+    
+    const saveParticipantsToLocalStorage = () => {
+      localStorage.setItem("participants", JSON.stringify(participants.value));
+    };
 
+    onMounted(() => {
+      const savedParticipants = localStorage.getItem("participants");
+      if (savedParticipants) {
+        participants.value = JSON.parse(savedParticipants);
+      }
+    });
+
+    watch(participants, saveParticipantsToLocalStorage, { deep: true });
+   
     const registerParticipant = () => {
       nameError.value = Validator.validateName(newParticipant.value.name);
       dateError.value = Validator.validateDateOfBirth(newParticipant.value.dateOfBirth, today);
