@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     onInput(event: Event) {
-      const target = event.target as HTMLInputElement | null; // Явно вказуємо тип
+      const target = event.target as HTMLInputElement | null;
       if (target) { 
         this.$emit('update:modelValue', target.value);
       }

@@ -21,14 +21,14 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import WinnerComponent from "./WinnerComponent.vue";
-import { Participant } from '../models/Participant'; // Імпортуємо тип Participant
+import { Participant } from '../models/Participant';
 
 export default defineComponent({
   name: "WinnerList",
   components: { WinnerComponent },
   props: {
     winners: {
-      type: Array as PropType<Participant[]>, // Визначаємо, що winners — це масив Participant
+      type: Array as PropType<Participant[]>,
       required: true,
     },
   },
