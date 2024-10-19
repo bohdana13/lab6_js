@@ -1,11 +1,14 @@
 <template>
   <div class="lottery-app">
+    <SearchBar @filter-by-name="filterParticipants" />
+
     <WinnerList 
-    :winners="winners" 
-    @remove-winner="removeWinner" />
+      :winners="winners" 
+      @remove-winner="removeWinner" 
+    />
 
     <ButtonComponent class="btn btn-primary mt-2"
-      :disabled="winners.length >= 3 || participants.length === 0"
+      :disabled="winners.length >= 3 || filteredParticipants.length === 0"
       @click="selectWinner"
     >
       New winner
@@ -19,18 +22,19 @@
     />
 
     <ParticipantsTable
-      :participants="participants"
+      :participants="filteredParticipants"
       @remove="removeParticipant"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from "vue";
+import { defineComponent, ref, onMounted, watch } from "vue";
 import WinnerList from "./components/WinnerList.vue";
 import RegistrationForm from "./components/RegistrationForm.vue";
 import ParticipantsTable from "./components/ParticipantsTable.vue";
 import ButtonComponent from "./components/ButtonComponent.vue";
+import SearchBar from "./components/SearchBar.vue";
 import { Participant } from './models/Participant'; 
 import { Validator } from './validation/Validator'; 
 
@@ -41,6 +45,7 @@ export default defineComponent({
     RegistrationForm,
     ParticipantsTable,
     ButtonComponent,
+    SearchBar,
   },
   setup() {
     const today = new Date().toISOString().split("T")[0]; 
@@ -52,6 +57,7 @@ export default defineComponent({
     });
 
     const participants = ref<Participant[]>([]);
+    const filteredParticipants = ref<Participant[]>([]);
 
     const winners = ref<Participant[]>([]);
 
@@ -59,7 +65,7 @@ export default defineComponent({
     const dateError = ref("");
     const emailError = ref("");
     const phoneError = ref("");
-    
+
     const saveParticipantsToLocalStorage = () => {
       localStorage.setItem("participants", JSON.stringify(participants.value));
     };
@@ -68,11 +74,18 @@ export default defineComponent({
       const savedParticipants = localStorage.getItem("participants");
       if (savedParticipants) {
         participants.value = JSON.parse(savedParticipants);
+        filteredParticipants.value = [...participants.value];
       }
     });
 
     watch(participants, saveParticipantsToLocalStorage, { deep: true });
-   
+
+    const filterParticipants = (searchTerm: string) => {
+      filteredParticipants.value = participants.value.filter(p =>
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    };
+
     const registerParticipant = () => {
       nameError.value = Validator.validateName(newParticipant.value.name);
       dateError.value = Validator.validateDateOfBirth(newParticipant.value.dateOfBirth, today);
@@ -84,6 +97,7 @@ export default defineComponent({
       }
 
       participants.value.push({ ...newParticipant.value });
+      filteredParticipants.value = [...participants.value];
       newParticipant.value.name = "";
       newParticipant.value.dateOfBirth = "";
       newParticipant.value.email = "";
@@ -92,25 +106,29 @@ export default defineComponent({
 
     const selectWinner = () => {
       if (participants.value.length > 0 && winners.value.length < 3) {
-        const randomIndex = Math.floor(Math.random() * participants.value.length);
-        const winner = participants.value[randomIndex];
+        const randomIndex = Math.floor(Math.random() * filteredParticipants.value.length);
+        const winner = filteredParticipants.value[randomIndex];
         winners.value.push(winner);
-        participants.value.splice(randomIndex, 1);
+        participants.value.splice(participants.value.indexOf(winner), 1);
+        filteredParticipants.value = [...participants.value];
       }
     };
 
     const removeWinner = (index: number) => {
       participants.value.push(winners.value[index]);
       winners.value.splice(index, 1);
+      filteredParticipants.value = [...participants.value];
     };
 
     const removeParticipant = (index: number) => {
       participants.value.splice(index, 1);
+      filteredParticipants.value = [...participants.value];
     };
 
     return {
       newParticipant,
       participants,
+      filteredParticipants,
       winners,
       nameError,
       dateError,
@@ -121,6 +139,7 @@ export default defineComponent({
       selectWinner,
       removeWinner,
       removeParticipant,
+      filterParticipants,
     };
   },
 });
