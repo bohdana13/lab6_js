@@ -95,7 +95,15 @@ export default defineComponent({
       if (nameError.value || dateError.value || emailError.value || phoneError.value) {
         return;
       }
+     
+      const existingParticipant = participants.value.find(
+        (participant) => participant.email === newParticipant.value.email
+      );
 
+      if (existingParticipant) {
+        emailError.value = "Учасник з такою електронною поштою вже існує.";
+        return;
+      }
       participants.value.push({ ...newParticipant.value });
       filteredParticipants.value = [...participants.value];
       newParticipant.value.name = "";
