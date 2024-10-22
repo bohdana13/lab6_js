@@ -2,7 +2,7 @@
   <button
     class="btn btn-primary"
     :disabled="disabled"
-    @click="onClick"
+    @click="$emit('click')"
   >
     <slot></slot>
   </button>
@@ -18,10 +18,5 @@ export default {
     },
   },
   emits: ["click"],
-  methods: {
-    onClick() {
-      this.$emit("click");
-    },
-  },
 };
 </script>

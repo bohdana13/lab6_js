@@ -12,6 +12,9 @@
             <button @click="sortByNameDesc">
               <i class="bi bi-sort-alpha-down-alt"></i>
             </button>
+            <!-- <button @click="sortBy('name')">
+    <i :class="sortKey === 'name' && sortAsc ? 'bi bi-sort-alpha-down' : 'bi bi-sort-alpha-down-alt'"></i>
+  </button> -->
           </th>
           <th>
             Date of Birth
@@ -25,6 +28,7 @@
           <th>Email</th>
           <th>Phone number</th>
           <th>Delete</th>
+          <th>Edit</th>
         </tr>
       </thead>
       <tbody>
@@ -37,6 +41,9 @@
           <td>
             <ButtonComponent @click="confirmRemove(participant)" class="delete-btn">Delete</ButtonComponent>
           </td>
+          <td>
+      <ButtonComponent @click="openEditModal(participant)" class="edit-btn">Edit</ButtonComponent>
+    </td>
         </tr>
       </tbody>
     </table>
@@ -47,25 +54,36 @@
       @confirm="removeParticipant"
       @cancel="isModalVisible = false"
     />
+    <EditParticipantModal
+  v-if="isEditModalVisible && editedParticipant"
+  :isVisible="isEditModalVisible"
+  :participant="editedParticipant"
+  :errors="errors"
+  @update="updateParticipant"
+  @cancel="isEditModalVisible = false"
+/>
+
+
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed, ref } from "vue";
+import { defineComponent, PropType, ref } from "vue";
 import { Participant } from '../models/Participant';
 import ButtonComponent from './ButtonComponent.vue';
 import ConfirmDeleteModal from './ModalComponent.vue';
+import EditParticipantModal from './EditParticipantModal.vue';
 
 export default defineComponent({
   name: "ParticipantsTable",
-  components: { ButtonComponent, ConfirmDeleteModal },
+  components: { ButtonComponent, ConfirmDeleteModal, EditParticipantModal  },
   props: {
     participants: {
       type: Array as PropType<Participant[]>,
       required: true,
     },
   },
-  emits: ["remove"],
+  emits: ["remove", "update"],
   data() {
     return {
       sortKey: "name", 
@@ -88,6 +106,14 @@ export default defineComponent({
     },
   },
   methods: {
+  //   sortBy(key: string) {
+  //   if (this.sortKey === key) {
+  //     this.sortAsc = !this.sortAsc;
+  //   } else {
+  //     this.sortKey = key;
+  //     this.sortAsc = true;
+  //   }
+  // },
     sortByNameAsc() {
       this.sortKey = "name";
       this.sortAsc = true;
@@ -110,7 +136,15 @@ export default defineComponent({
   },
   setup(props, { emit }) { 
     const isModalVisible = ref(false);
+    const isEditModalVisible = ref(false);
     const selectedParticipant = ref<Participant | null>(null);
+    const editedParticipant = ref<Participant | null>(null);
+    const errors = ref({
+      name: "",
+      dateOfBirth: "",
+      email: "",
+      phoneNumber: ""
+    });
 
     const confirmRemove = (participant: Participant) => {
       selectedParticipant.value = participant;
@@ -127,11 +161,29 @@ export default defineComponent({
         selectedParticipant.value = null;
       }
     };
+    const openEditModal = (participant: Participant) => {
+      editedParticipant.value = { ...participant };
+      isEditModalVisible.value = true;
+    };
+
+    const updateParticipant = (updatedData: Participant) => {
+      const participantIndex = props.participants.findIndex(p => p.email === updatedData.email);
+      if (participantIndex !== -1) {
+        emit("update", updatedData);
+      }
+      isEditModalVisible.value = false;
+    };
+
     return {
-      isModalVisible,
+       isModalVisible,
+      isEditModalVisible,
       selectedParticipant,
+      editedParticipant,
       confirmRemove,
-      removeParticipant
+      updateParticipant,
+      removeParticipant,
+      openEditModal,
+      errors,
     };
   }
 });

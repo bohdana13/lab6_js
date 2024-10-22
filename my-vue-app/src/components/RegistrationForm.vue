@@ -1,8 +1,9 @@
+<!-- eslint-disable vue/no-mutating-props -->
 <template>
   <div class="card">
     <h3>REGISTER FORM</h3>
     <p>Please fill in all the fields.</p>
-    <form @submit.prevent="register" novalidate>
+    <form @submit.prevent="register" @keyup.enter="register" novalidate>
       <InputComponent
         label="Name"
         v-model="newParticipant.name"

@@ -26,7 +26,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .winner-tags .badge {
   display: flex;
   color: rgb(249, 249, 249);
@@ -35,7 +35,9 @@ export default defineComponent({
   gap: 5px;
   padding: 10px;
   font-size: 1rem;
-  
+  &:hover {
+      color: rgb(13, 13, 13);
+    }
 }
 
 .blue {

@@ -22,9 +22,11 @@
     />
 
     <ParticipantsTable
-      :participants="filteredParticipants"
-      @remove="removeParticipant"
-    />
+  :participants="filteredParticipants"
+  @remove="removeParticipant"
+  @update="updateParticipant"
+/>
+
   </div>
 </template>
 
@@ -133,6 +135,15 @@ export default defineComponent({
       filteredParticipants.value = [...participants.value];
     };
 
+    const updateParticipant = (updatedParticipant: Participant) => {
+  const participantIndex = participants.value.findIndex(p => p.email === updatedParticipant.email);
+  if (participantIndex !== -1) {
+    participants.value[participantIndex] = updatedParticipant;
+    filteredParticipants.value = [...participants.value];
+  }
+};
+
+
     return {
       newParticipant,
       participants,
@@ -148,12 +159,13 @@ export default defineComponent({
       removeWinner,
       removeParticipant,
       filterParticipants,
+      updateParticipant
     };
   },
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .lottery-app {
   display: grid;
   grid-template-columns: 1fr;
@@ -179,6 +191,9 @@ export default defineComponent({
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  &:hover {
+      color: rgb(19, 18, 18);
+    }
 }
 
 .winner-tags .badge {
