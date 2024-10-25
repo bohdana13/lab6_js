@@ -1,7 +1,8 @@
 <template>
   <div class="form-group">
-    <label>{{ label }}</label>
+    <label :for="id">{{ label }}</label>
     <input
+      :id="id"
       :type="type"
       :value="modelValue"
       @input="onInput"
@@ -17,6 +18,7 @@
 export default {
   name: "InputComponent",
   props: {
+    id: String,
     label: String,
     type: String,
     modelValue: String,

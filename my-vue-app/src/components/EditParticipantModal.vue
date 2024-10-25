@@ -1,111 +1,68 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
-  <div class="modal" v-if="isVisible" @keyup.esc="cancelUpdate">
-    <div class="modal-content">
-      <h4>Edit Participant</h4>
-      <form @submit.prevent="submitUpdate">
-        <InputComponent
-          label="Name"
-          v-model="participant.name"
-          type="text"
-          placeholder="Enter user name"
-          :error="errors.name"
-        />
-        <InputComponent
-          label="Date of Birth"
-          v-model="participant.dateOfBirth"
-          type="date"
-          :error="errors.dateOfBirth"
-        />
-        <InputComponent
-          label="Email"
-          v-model="participant.email"
-          type="email"
-          placeholder="Enter email"
-          :error="errors.email"
-          disabled
-        />
-        <InputComponent
-          label="Phone number"
-          v-model="participant.phoneNumber"
-          type="tel"
-          placeholder="Enter phone number"
-          :error="errors.phoneNumber"
-        />
-        <ButtonComponent type="submit">Update data</ButtonComponent>
-      </form>
-      <ButtonComponent @click="cancelUpdate" class="btn btn-secondary">Cancel</ButtonComponent>
+  <Modal v-if="isVisible" @close="cancelEdit">
+    <h3>Edit Participant</h3>
+    <div>
+      <InputComponent 
+        :id="idName"
+        label="Name"
+        type="text"
+        v-model="participant.name"
+      />
+      
+      <InputComponent 
+        :id="idDateOfBirth"
+        label="Date of Birth"
+        type="date"
+        v-model="participant.dateOfBirth"
+      />
+     
+      <InputComponent 
+        :id="idEmail"
+        label="Email"
+        type="email"
+        v-model="participant.email"
+      />
+      
+      <InputComponent 
+        :id="idPhone"
+        label="Phone Number"
+        type="text"
+        v-model="participant.phoneNumber"
+      />
     </div>
-  </div>
+    <button @click="saveChanges">Save</button>
+    <button @click="cancelEdit">Cancel</button>
+  </Modal>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, onMounted, onBeforeUnmount } from "vue";
-import InputComponent from "./InputComponent.vue";
-import ButtonComponent from "./ButtonComponent.vue";
-import { Participant } from '../models/Participant';
-import { Validator } from '../validation/Validator';
+<script>
+import { defineComponent } from 'vue';
+import Modal from './Modal.vue';
+import InputComponent from './InputComponent.vue';
 
 export default defineComponent({
-  name: "EditParticipantModal",
-  components: { InputComponent, ButtonComponent },
+  components: { Modal, InputComponent },
   props: {
-    isVisible: {
-      type: Boolean,
-      required: true,
+    participant: Object,
+    isVisible: Boolean,
+    id: String,
+    idName: String,
+    idEmail: String,
+    idDateOfBirth: String,
+    idPhone: String,
+  },
+  emits: ['update', 'cancel'],
+  methods: {
+    saveChanges() {
+      this.$emit('update', this.participant);
     },
-    participant: {
-      type: Object as () => Participant,
-      required: true,
-    },
-    errors: {
-      type: Object,
-      required: true,
+    cancelEdit() {
+      this.$emit('cancel');
     }
-  },
-  emits: ["update", "cancel"],
-  setup(props, { emit }) {
-    const errors = ref(props.errors);
-
-    const submitUpdate = () => {
-      errors.value.name = Validator.validateName(props.participant.name);
-      errors.value.dateOfBirth = Validator.validateDateOfBirth(
-        props.participant.dateOfBirth, 
-        new Date().toISOString().split('T')[0]
-      );
-      errors.value.phoneNumber = Validator.validatePhoneNumber(props.participant.phoneNumber);
-
-      if (!errors.value.name && !errors.value.dateOfBirth && !errors.value.phoneNumber) {
-        emit("update", props.participant);
-      }
-    };
-
-    const cancelUpdate = () => {
-      emit("cancel");
-    };
-
-    const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        cancelUpdate();
-      }
-    };
-
-    onMounted(() => {
-      document.addEventListener('keyup', handleKeyUp);
-    });
-
-    onBeforeUnmount(() => {
-      document.removeEventListener('keyup', handleKeyUp);
-    });
-
-    return {
-      submitUpdate,
-      cancelUpdate,
-    };
-  },
+  }
 });
 </script>
-
 
 <style scoped>
 .modal {
@@ -114,7 +71,7 @@ export default defineComponent({
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(179, 170, 170, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
