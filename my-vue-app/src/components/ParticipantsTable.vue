@@ -12,9 +12,6 @@
             <button @click="sortByNameDesc">
               <i class="bi bi-sort-alpha-down-alt"></i>
             </button>
-            <!-- <button @click="sortBy('name')">
-    <i :class="sortKey === 'name' && sortAsc ? 'bi bi-sort-alpha-down' : 'bi bi-sort-alpha-down-alt'"></i>
-  </button> -->
           </th>
           <th>
             Date of Birth
@@ -106,14 +103,6 @@ export default defineComponent({
     },
   },
   methods: {
-  //   sortBy(key: string) {
-  //   if (this.sortKey === key) {
-  //     this.sortAsc = !this.sortAsc;
-  //   } else {
-  //     this.sortKey = key;
-  //     this.sortAsc = true;
-  //   }
-  // },
     sortByNameAsc() {
       this.sortKey = "name";
       this.sortAsc = true;
