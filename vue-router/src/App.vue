@@ -6,7 +6,8 @@ import ParticipantsTable from "./components/ParticipantsTable.vue";
 import ButtonComponent from "./components/ButtonComponent.vue";
 import SearchBar from "./components/SearchBar.vue";
 import { Participant } from './models/Participant'; 
-import { Validator } from './validation/Validator'; 
+import UsersRepository from './repository/UsersRepository';
+import AppHeader from './components/AppHeader.vue';
 
 export default defineComponent({
   name: "LotteryApp",
@@ -16,6 +17,7 @@ export default defineComponent({
     ParticipantsTable,
     ButtonComponent,
     SearchBar,
+    AppHeader,
   },
   setup() {
     const today = new Date().toISOString().split("T")[0]; 
@@ -40,13 +42,21 @@ export default defineComponent({
       localStorage.setItem("participants", JSON.stringify(participants.value));
     };
 
-    onMounted(() => {
-      const savedParticipants = localStorage.getItem("participants");
-      if (savedParticipants) {
-        participants.value = JSON.parse(savedParticipants);
-        filteredParticipants.value = [...participants.value];
-      }
-    });
+    onMounted(async () => {
+  const savedParticipants = localStorage.getItem("participants");
+  if (savedParticipants) {
+    try {
+      participants.value = JSON.parse(savedParticipants) || [];
+    } catch (error) {
+      console.error("Failed to parse participants from localStorage:", error);
+      participants.value = [];
+    }
+  } else {
+    participants.value = await UsersRepository.fetchParticipants();
+  }
+  filteredParticipants.value = [...participants.value];
+});
+
 
     watch(participants, saveParticipantsToLocalStorage, { deep: true });
 
@@ -56,31 +66,19 @@ export default defineComponent({
       );
     };
 
-    const registerParticipant = () => {
-      nameError.value = Validator.validateName(newParticipant.value.name);
-      dateError.value = Validator.validateDateOfBirth(newParticipant.value.dateOfBirth, today);
-      emailError.value = Validator.validateEmail(newParticipant.value.email);
-      phoneError.value = Validator.validatePhoneNumber(newParticipant.value.phoneNumber);
+    const registerParticipant = (participant: Participant) => {
+  const existingParticipant = participants.value.find(
+    (p) => p.email === participant.email
+  );
+  if (existingParticipant) {
+    alert("A participant with this email already exists.");
+    return;
+  }
+  
+  participants.value.push(participant);
+  filteredParticipants.value = [...participants.value];
+};
 
-      if (nameError.value || dateError.value || emailError.value || phoneError.value) {
-        return;
-      }
-     
-      const existingParticipant = participants.value.find(
-        (participant) => participant.email === newParticipant.value.email
-      );
-
-      if (existingParticipant) {
-        emailError.value = "A participant with such e-mail already exists";
-        return;
-      }
-      participants.value.push({ ...newParticipant.value });
-      filteredParticipants.value = [...participants.value];
-      newParticipant.value.name = "";
-      newParticipant.value.dateOfBirth = "";
-      newParticipant.value.email = "";
-      newParticipant.value.phoneNumber = "";
-    };
 
     const selectWinner = () => {
       if (participants.value.length > 0 && winners.value.length < 3) {
@@ -135,6 +133,10 @@ export default defineComponent({
 
 <template>
   <div class="lottery-app">
+    
+    <AppHeader />
+  <router-view />
+
     <SearchBar @filter-by-name="filterParticipants" />
 
     <WinnerList 
@@ -152,7 +154,6 @@ export default defineComponent({
     <RegistrationForm
       :newParticipant="newParticipant"
       :today="today"
-      :errors="{ name: nameError, dateOfBirth: dateError, email: emailError, phoneNumber: phoneError }"
       @register="registerParticipant"
     />
 
