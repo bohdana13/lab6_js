@@ -6,7 +6,7 @@
             <th>ID</th>
             <th>Name</th>
             <th>Details</th>
-            <th>Actions</th>
+            <!-- <th>Actions</th> -->
           </tr>
         </thead>
         <tbody>
@@ -16,9 +16,9 @@
             <td>
               <router-link :to="`/users/${user.id}`">View Details</router-link>
             </td>
-            <td>
+            <!-- <td>
               <button @click="openEditUserModal(user)">Edit</button>
-            </td>
+            </td> -->
           </tr>
         </tbody>
       </table>
